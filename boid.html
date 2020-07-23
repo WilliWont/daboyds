@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>me and the boids</title>
+    <style>
+        *{
+            padding:0;
+            margin:0;
+        }
+        body{
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id = "canvas-div"></div>
+    amount
+    <input type="range" id="amount" min="1" max="500" step="1" value="50">
+    <br>
+    alignment
+    <input type="range" id="align" min="0" max="4" step="0.1" value="1">
+    separation
+    <input type="range" id="separate" min="0" max="4" step="0.1" value="1">
+    cohesion
+    <input type="range" id="cohese" min="0" max="4" step="0.1" value="1">
+    <br>
+    perception
+    <input type="range" id="percept" min="0" max="4" step="0.1" value="1">
+
+    <script src="js/p5.js"></script>
+    <script src="js/boid.js"></script>
+    <script src="js/flock.js"></script>
+    <script src="js/boid_sketch.js"></script>
+</body>
+</html>
