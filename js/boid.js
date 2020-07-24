@@ -1,19 +1,29 @@
 class Boid {
     static perception;
-
+    static basePerception;
     static perceptionMult;
+
+    static sizeMult;
+
     static alignmentMult;
     static cohesionMult;
     static separationMult;
 
+    static baseWidth;
+    static baseLen;
+    static baseDep;
+
     static width;
     static len;
     static dep;
+    
     static debugcolor;
 
     static min_vel_mag;
     static max_vel_mag;
     static max_accel_mag;
+
+    static possibleColor;
 
     constructor(){
         this.debug = false;
@@ -21,29 +31,34 @@ class Boid {
         this.position = createVector(
             random(0,width),
             random(0,height)
-            );
+        );
 
         this.velocity = p5.Vector.random2D();
         this.velocity.setMag(random(7,10));
         this.acceleration = createVector();
 
-        Boid.min_vel_mag = 10;
+        Boid.min_vel_mag = 7;
         Boid.max_vel_mag = 15;
-        Boid.max_accel_mag = 0.5;
 
-        this.color = color(40);
-        this.fill = color(250);
+        Boid.possibleColor = [color(100),color(120),color(150),color(175)];
+        let index = Math.floor(random(0,Boid.possibleColor.length));
+        // console.log('index: ' + index);
         
-        Boid.debugcolor = color(240,0,0);
-        Boid.width = 6;
-        Boid.len = 20;
-        Boid.dep = -5;
+        this.color = Boid.possibleColor[index];
+        this.fill = Boid.possibleColor[index];
 
-        Boid.perception = 75;
-        Boid.perceptionMult = 1;
-        Boid.alignmentMult = 1;
-        Boid.cohesionMult = 1;
-        Boid.separationMult = 1;
+        // console.log("color: " + this.color + '\n' +
+                    // "fill: " + this.fill + '\n' +
+                    // 'pC: ' + Boid.possibleColor[0]);
+
+
+        Boid.debugcolor = color(240,0,0);
+
+        Boid.baseWidth = 3;
+        Boid.baseLen = 10;
+        Boid.baseDep = -2.5;
+
+        Boid.basePerception = 35;
     }
 
     update(){
@@ -75,7 +90,7 @@ class Boid {
                                     .sub(other.position.x, other.position.y);
                     
                     if(d != 0)
-                        difference.div((d));
+                        difference.div((d*d));
 
                     // separation
                     separation.add(difference);
@@ -98,17 +113,19 @@ class Boid {
             alignment.div(count);
             separation.div(count);
             
+            let max_accel = Boid.max_accel_mag * 1.0;
+
             cohesion.setMag(Boid.max_vel_mag);
             cohesion.sub(this.velocity);
-            cohesion.limit(Boid.max_accel_mag);
+            cohesion.limit(max_accel);
 
             alignment.setMag(Boid.max_vel_mag);
             alignment.sub(this.velocity);
-            alignment.limit(Boid.max_accel_mag);
+            alignment.limit(max_accel);
 
             separation.setMag(Boid.max_vel_mag);
             separation.sub(this.velocity);
-            separation.limit(Boid.max_accel_mag);
+            separation.limit(max_accel);
         }
 
         desired.add(cohesion.x * Boid.cohesionMult, cohesion.y * Boid.cohesionMult);
@@ -121,6 +138,7 @@ class Boid {
 
     show(){
         push();
+
         fill(this.fill);
         stroke(this.color);
         // strokeWeight(0);
@@ -129,19 +147,6 @@ class Boid {
         let angle = (acos(this.velocity.x * 1.0 / this.velocity.mag() * 1.0));
         angle = (this.velocity.y < 0) ? -angle : angle;
         rotate(angle);
-        
-        // triangle(Boid.len,0,
-        //          0,  Boid.width,
-        //          0, -Boid.width);
-
-        // triangle(0, 0,
-        //         0,  Boid.width,
-        //         Boid.dep, Boid.width);
-
-        // triangle(0, 0,
-        //     0,  -Boid.width,
-        //     Boid.dep, -Boid.width);
-    
 
         beginShape();
         vertex(0,0);
@@ -211,5 +216,18 @@ class Boid {
 
     setVelocity(velocity){
         this.velocity = velocity;
+    }
+
+    static setSize(size){
+        Boid.sizeMult = size;
+        Boid.width = Boid.baseWidth * Boid.sizeMult;
+        Boid.dep = Boid.baseDep * Boid.sizeMult;
+        Boid.len = Boid.baseLen * Boid.sizeMult;
+        Boid.perception = Boid.basePerception * Boid.sizeMult * Boid.perceptionMult;
+    }
+
+    static setPerception(perception){
+        Boid.perceptionMult = perception;
+        Boid.perception = Boid.basePerception * Boid.sizeMult * Boid.perceptionMult;
     }
 }

@@ -23,7 +23,7 @@ class Flock{
 
     insertBoid(boidToAdd){
         this.boid.push(boidToAdd);
-        console.log('new boid');
+
     }
 
     removeBoid(){
