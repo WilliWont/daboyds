@@ -3,14 +3,20 @@ class Flock{
         this.boid = [];
     }
 
-    show(){
-        let boidToCheck = Array.from(this.boid);
+    show(gridToCheck){
+        let comparisons = 0;
+        // let boidToCheck = gridToCheck.getNearbyObject(this.boid);
         for(let boid of this.boid){
-            boid.show();
-            boid.flockTo(boidToCheck);
+
+            comparisons += boid.flockTo(gridToCheck.getNearbyObject(boid, boid.getRadius()));
+    
+                // comparisons += boid.flockTo(this.boid);
+
             boid.update();
+            boid.show();
             // boid.showdebug();
         }
+        return comparisons;
     }
     
     // update(){
