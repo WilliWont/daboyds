@@ -18,12 +18,15 @@ class Boid {
     static dep;
     
     static debugcolor;
+    static detectionColor;
 
     static min_vel_mag;
     static max_vel_mag;
     static max_accel_mag;
 
     static possibleColor;
+
+    static radius;
 
     constructor(){
         this.debug = false;
@@ -34,25 +37,24 @@ class Boid {
         );
 
         this.velocity = p5.Vector.random2D();
-        this.velocity.setMag(random(7,10));
-        this.acceleration = createVector();
-
+        this.velocity.setMag(random(7 ,10));
         Boid.min_vel_mag = 7;
         Boid.max_vel_mag = 15;
 
+        // this.velocity.setMag(random(1 ,2));
+        // Boid.min_vel_mag = 1;
+        // Boid.max_vel_mag = 3;
+
+        this.acceleration = createVector();
+
         Boid.possibleColor = [color(100),color(120),color(150),color(175)];
         let index = Math.floor(random(0,Boid.possibleColor.length));
-        // console.log('index: ' + index);
         
         this.color = Boid.possibleColor[index];
         this.fill = Boid.possibleColor[index];
 
-        // console.log("color: " + this.color + '\n' +
-                    // "fill: " + this.fill + '\n' +
-                    // 'pC: ' + Boid.possibleColor[0]);
-
-
         Boid.debugcolor = color(240,0,0);
+        Boid.detectionColor = color('#1dcd9f');
 
         Boid.baseWidth = 3;
         Boid.baseLen = 10;
@@ -69,6 +71,8 @@ class Boid {
     }
     
     flockTo(boids){
+        let comparisons = 0;
+
         let desired = createVector();
 
         let cohesion = createVector();
@@ -78,8 +82,20 @@ class Boid {
         let count = 0;
 
         for(let other of boids){
+            comparisons++;
             let d = dist(this.position.x, this.position.y, 
                         other.position.x, other.position.y);
+
+            if(this.debug){
+                push();
+                noFill();
+                strokeWeight(2);
+                stroke(Boid.detectionColor);
+                let size = Boid.width * 4;
+                square(other.position.x-size, other.position.y-size, size);
+                pop();
+            }
+
 
             if(other != this && d < Boid.perception * Boid.perceptionMult){
                     if(this.debug){
@@ -90,7 +106,7 @@ class Boid {
                                     .sub(other.position.x, other.position.y);
                     
                     if(d != 0)
-                        difference.div((d*d));
+                        difference.div((d));
 
                     // separation
                     separation.add(difference);
@@ -134,6 +150,8 @@ class Boid {
 
         this.acceleration.set(0,0);
         this.acceleration.add(desired);
+
+        return comparisons;
     }
 
     show(){
@@ -148,14 +166,25 @@ class Boid {
         angle = (this.velocity.y < 0) ? -angle : angle;
         rotate(angle);
 
+        // this.drawBasicBoid();
+        this.drawDetailedBoid();
+
+        pop();
+    }
+
+    drawDetailedBoid(){
         beginShape();
         vertex(0,0);
         vertex(Boid.dep, Boid.width);
         vertex(Boid.len, 0);
         vertex(Boid.dep, -Boid.width);
         endShape(CLOSE);
+    }
 
-        pop();
+    drawBasicBoid(){
+        triangle(0, Boid.width, 
+                 0, -Boid.width, 
+                 Boid.len, 0);
     }
 
     showdebug(){
@@ -169,7 +198,7 @@ class Boid {
             (this.position.y+this.velocity.y*10)
             );
         noFill();
-        circle(this.position.x, this.position.y, Boid.perception * Boid.perceptionMult * 2);
+        circle(this.position.x, this.position.y, Boid.perception * 2);
         pop();
     }
 
@@ -218,16 +247,23 @@ class Boid {
         this.velocity = velocity;
     }
 
+    getRadius(){
+        return Boid.radius;
+    }
+
     static setSize(size){
         Boid.sizeMult = size;
         Boid.width = Boid.baseWidth * Boid.sizeMult;
         Boid.dep = Boid.baseDep * Boid.sizeMult;
         Boid.len = Boid.baseLen * Boid.sizeMult;
+
         Boid.perception = Boid.basePerception * Boid.sizeMult * Boid.perceptionMult;
+        Boid.radius = Boid.perception;
     }
 
     static setPerception(perception){
         Boid.perceptionMult = perception;
         Boid.perception = Boid.basePerception * Boid.sizeMult * Boid.perceptionMult;
+        Boid.radius = Boid.perception;
     }
 }

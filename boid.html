@@ -8,6 +8,7 @@
         *{
             padding:0;
             margin:0;
+            font-family: sans-serif;
             color:rgb(70,70,70);
         }
         #canvas-div{
@@ -18,30 +19,41 @@
         .side-bar{
             position:absolute;
             top: 2vh;
-            width:7.5vw;
-            padding: 2vh 1vw;
+            /* width:7.5vw; */
+            /* min-width:7.5vw; */
+            width:125px;
+            /* padding: 2vh 1vw; */
+            padding: 2vh 15px;
             display: flex;
             flex-direction: column;
-            background-color: rgba(40,40,40,0.1);
+            background-color: rgba(40,40,40,0.15);
             box-shadow: 0px 1px 5px rgba(0,0,0,0.2);
             /* left:-1vw; */
         }
-
+        .tab-open{
+            transition: ease .2s;
+            left: 0;
+        }
+        .tab-close{
+            transition: ease .2s;
+            left: -155px;
+        }
         .tab-arrow{
             transition: ease .25s;
             position:absolute;
-            font-weight:900;
             top:5%;
             display: flex;
-            border-top-right-radius: 3px;
-            border-bottom-right-radius: 3px;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size:1em;
+
+            border-top-right-radius: 3px;
+            border-bottom-right-radius: 3px;
             background-color: rgba(48, 113, 169, 0.5);
-            width:15%;
-            height:15%;
-            right:-15%;
+
+            width:20%;
+            height:12.5%;
+            right:-20%;
         }
 
         .tab-arrow:hover{
@@ -78,31 +90,36 @@
         input[type=range]:focus::-webkit-slider-runnable-track {
             background: rgb(48, 113, 169);
         }
-        #debug-behavior{
-            /* display:none; */
-        }
-
         #boid-behaviour, #flock-behaviour{
             margin: 1vh 0;
         }
-        .tab-open{
-            transition: ease .2s;
-            left: 0;
-        }
-        .tab-close{
-            transition: ease .2s;
-            left: -9.5vw;
-        }
-        .text-flip{
-            transition: ease .2s;
-            transform:rotate(180deg);
-        }
         .slider-pair{
             display:grid;
-            grid-template-columns: 75% 25%;
-            column-gap: .25vw;;
-            /* align-items: center;
-            justify-content: center; */
+            grid-template-columns: 80% 20%;
+            column-gap: 5%;
+        }
+        #comparisonOutput, #gridOutput, #fpsOutput{
+            color:rgb(48, 113, 169);
+            font-size: 90%;
+        }
+        input[type=text]{
+            background-color: rgba(0,0,0,0);
+            border: none;
+            outline: none;
+        }
+        #setting-tab-icon{
+            transition: ease .2s;
+            transform:rotate(90deg);
+            width:45%;
+            height:45%;
+            opacity: 50%;
+        }
+        .setting-div h2{
+            font-weight:900;
+            margin-bottom: 2px;
+        }
+        .setting-div h5{
+            margin-top: 10px;
         }
     </style>
     <link rel="icon" href="icon.svg">
@@ -111,70 +128,83 @@
     <div id = "canvas-div">
 
         <div class="side-bar tab-close" id="setting-tab">
-            <h1>settings</h1>
-            <div id="boid-behaviour">
+            <div id="boid-behaviour" class="setting-div">
                 <h2>boid</h2>
 
                 <h5>amount</h5>
                 <div class="slider-pair">
-                    <input type="range" id="amount" min="1" max="500" step="1" value="100" class="slider">
-                    <output id="amountOutput"></output>
+                    <input type="range" id="amount" min="1" max="1000" step="1" value="200" class="slider">
+                    <input type="text" id="amountOutput" disabled>
                 </div>
 
                 <h5>size</h5>
                 <div class="slider-pair">
-                    <input type="range" id="size" min="0.5" max="3" step="0.05" value="1" class="slider">
-                    <output id="sizeOutput"></output>
+                    <input type="range" id="size" min="1" max="2" step="0.05" value="1" class="slider">
+                    <input type = "text" id="sizeOutput" disabled>
                 </div>
                 
                 <h5>perception</h5>
                 <div class="slider-pair">
-                    <input type="range" id="percept" min="0.1" max="4" step="0.05" value="1" class="slider">
-                    <output id="perceptOutput"></output>
+                    <input type="range" id="percept" min="1" max="2" step="0.05" value="1" class="slider">
+                    <input type = "text" id="perceptOutput" disabled>
                 </div>
                 
                 <h5>reaction</h5>
                 <div class="slider-pair">
-                    <input type="range" id="react" min="0" max="1" step="0.05" value="0.8" class="slider">
-                    <output id="reactOutput"></output>
+                    <input type="range" id="react" min="1" max="2" step="0.05" value="1" class="slider">
+                    <input type = "text" id="reactOutput" disabled>
                 </div>
             
             </div>
             
-            <div id="flock-behaviour">
+            <div id="flock-behaviour" class="setting-div">
                 <h2>flock</h2>
                 <h5>alignment</h5>
                 <div class="slider-pair">
                     <input type="range" id="align" min="0" max="4" step="0.05" value="1" class="slider">
-                    <output id="alignOutput"></output>
+                    <input type = "text" id="alignOutput" disabled>
                 </div>
                 
                 <h5>separation</h5>
                 <div class="slider-pair">
                     <input type="range" id="separate" min="0" max="4" step="0.05" value="1.25" class="slider">
-                    <output id="separateOutput"></output>
+                    <input type = "text" id="separateOutput" disabled>
                 </div>
                 
                 <h5>cohesion</h5>
                 <div class="slider-pair">
                     <input type="range" id="cohese" min="0" max="4" step="0.05" value="1" class="slider">
-                    <output id="coheseOutput"></output>
+                    <input type = "text" id="coheseOutput" disabled>
                 </div>
             
             </div>
 
-            <div id="debug-behavior">
+            <div id="debug-behavior" class="setting-div">
                 <h2>debug</h2>
-                toggle
+                <span>toggle:</span>
                 <input type="checkbox" id="debug">
+                <br>
+                <span>fps:</span>
+                <output id="fpsOutput"></output>
+                <br>
+                <span>comparison:</span>
+                <output id="comparisonOutput"></output>
+                <br>
+                <span>grid:</span>
+                <output id="gridOutput"></output>
             </div>
 
             <div class = "tab-arrow" onclick="toggleTab()">
-                <div class = "text-upright text-flip" id = "setting-tab-arrow">></div>
+                <img src="setting.svg" id = "setting-tab-icon" alt="settings">
+                </img>
             </div>
+            <!-- Icons made by <a href="https://www.flaticon.com/authors/freepik" 
+            title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" 
+            title="Flaticon"> www.flaticon.com</a> -->
         </div>
     </div>
     <script src="js/p5.js"></script>
+    <script src="js/grid.js"></script>
     <script src="js/boid.js"></script>
     <script src="js/flock.js"></script>
     <script src="js/boid_sketch.js"></script>

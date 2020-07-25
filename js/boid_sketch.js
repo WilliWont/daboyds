@@ -1,3 +1,6 @@
+
+//#region variables declaration
+let grid;
 let flock = new Flock();
 
 let alignSlider = document.getElementById('align');
@@ -8,16 +11,27 @@ let amountSlider = document.getElementById('amount');
 let reactSlider = document.getElementById('react');
 let sizeSlider = document.getElementById('size');
 
-let alignSliderOutput = document.getElementById('alignOutput');
-let separateSliderOutput = document.getElementById('separateOutput');
-let coheseSliderOutput = document.getElementById('coheseOutput');
-let perceptSliderOutput = document.getElementById('perceptOutput');
-let amountSliderOutput = document.getElementById('amountOutput');
-let reactSliderOutput = document.getElementById('reactOutput');
-let sizeSliderOuput = document.getElementById('sizeOutput');
+let alignOuput = document.getElementById('alignOutput');
+let separateOuput = document.getElementById('separateOutput');
+let coheseOuput = document.getElementById('coheseOutput');
+let perceptOuput = document.getElementById('perceptOutput');
+let amountOuput = document.getElementById('amountOutput');
+let reactOuput = document.getElementById('reactOutput');
+let sizeOuput = document.getElementById('sizeOutput');
 
+// let alignSliderInput = document.getElementById('alignInput');
+// let separateSliderInput = document.getElementById('separateInput');
+// let coheseSliderInput = document.getElementById('coheseInput');
+// let perceptSliderInput = document.getElementById('perceptInput');
+// let amountSliderInput = document.getElementById('amountInput');
+// let reactSliderInput = document.getElementById('reactInput');
+// let sizeSliderInput = document.getElementById('sizeInput');
+
+let gridOutput = document.getElementById('gridOutput');
+let fpsOutput = document.getElementById('fpsOutput');
+let comparisonOuput = document.getElementById('comparisonOutput');
 let debugBox = document.getElementById('debug');
-
+//#endregion
 
 
 function setup(){
@@ -28,13 +42,13 @@ function setup(){
         flock.insertBoid(new Boid());
     }
 
-    perceptSliderOutput.value = perceptSlider.value;
-    alignSliderOutput.value = alignSlider.value;
-    separateSliderOutput.value = separateSlider.value;
-    coheseSliderOutput.value = coheseSlider.value;
-    amountSliderOutput.value = amountSlider.value;
-    reactSliderOutput.value = reactSlider.value;
-    sizeSliderOuput.value = sizeSlider.value;
+    perceptOuput.value = perceptSlider.value;
+    alignOuput.value = alignSlider.value;
+    separateOuput.value = separateSlider.value;
+    coheseOuput.value = coheseSlider.value;
+    amountOuput.value = amountSlider.value;
+    reactOuput.value = reactSlider.value;
+    sizeOuput.value = sizeSlider.value;
 
     Boid.alignmentMult = alignSlider.value;
     Boid.separationMult = separateSlider.value;
@@ -51,59 +65,72 @@ function setup(){
         flock.boid[0].setColor(Boid.debugcolor);
         flock.boid[0].setFill(Boid.debugcolor);
     }
+
+    grid = new Grid(Boid.perception);
+    // grid.setCellSize(20);
 }
+
 
 function draw(){
+    fpsOutput.value = Math.floor(frameRate());
+    let comparisons = 0;
+    let gridComp = 0;
     background(250);
-    if(flock.boid[0].debug)
+    gridComp = grid.update(flock.boid);
+
+    if(flock.boid[0].debug){
+        grid.showdebug(flock.boid[0],flock.boid[0].getRadius());
         flock.boid[0].showdebug();
-    
-    flock.show();
+    }
+
+    comparisons = flock.show(grid);
+    comparisonOutput.value = comparisons;
+    gridOutput.value = gridComp;
+    // grid.show();
 }
 
+//#region sliders and tab
 let tabClosed = false;
 let settingElem = document.getElementById("setting-tab");
-let settingArrow = document.getElementById("setting-tab-arrow");
 let settingLoc = settingElem.getBoundingClientRect();
 function toggleTab(){
     tabClosed = settingElem.classList.contains('tab-close');
     if(tabClosed){
       settingElem.classList.add('tab-open');
       settingElem.classList.remove('tab-close');
-      settingArrow.classList.remove("text-flip");
       tabClosed = false;
     } else {
       settingElem.classList.add('tab-close');
       settingElem.classList.remove('tab-open');
-      settingArrow.classList.add("text-flip");
       settingLoc = settingElem.getBoundingClientRect();
       tabClosed = true;
     }
-  }
+}
 
 perceptSlider.oninput = function(){
-    perceptSliderOutput.value = perceptSlider.value;
+    perceptOuput.value = perceptSlider.value;
     Boid.setPerception(perceptSlider.value);
+    grid.reInitGrid(Boid.radius);
 }
 
 alignSlider.oninput = function(){
-    alignSliderOutput.value = alignSlider.value;
+    alignOuput.value = alignSlider.value;
     Boid.alignmentMult = alignSlider.value;
 }
 
 separateSlider.oninput = function(){
-    separateSliderOutput.value = separateSlider.value;
+    separateOuput.value = separateSlider.value;
     Boid.separationMult = separateSlider.value;
 }
 
 coheseSlider.oninput = function(){
-    coheseSliderOutput.value = coheseSlider.value;
+    coheseOuput.value = coheseSlider.value;
     Boid.cohesionMult = coheseSlider.value;
 }
 
 amountSlider.oninput = function(){
     let value = amountSlider.value;
-    amountSliderOutput.value = value;
+    amountOuput.value = value;
     // console.log('val: ' + value);
     while(flock.boid.length > value){
         flock.removeBoid();
@@ -116,13 +143,14 @@ amountSlider.oninput = function(){
 }
 
 reactSlider.oninput = function(){
-    reactSliderOutput.value = reactSlider.value;
+    reactOuput.value = reactSlider.value;
     Boid.max_accel_mag = reactSlider.value;
 }
 
 sizeSlider.oninput = function(){
-    sizeSliderOuput.value = sizeSlider.value;
+    sizeOuput.value = sizeSlider.value;
     Boid.setSize(sizeSlider.value);
+    grid.reInitGrid(Boid.radius);
 }
 
 debugBox.oninput = function(){
@@ -136,3 +164,4 @@ debugBox.oninput = function(){
     }
 
 }
+//#endregion
