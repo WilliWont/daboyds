@@ -3,33 +3,33 @@ class Flock{
         this.boid = [];
     }
 
-    show(gridToCheck){
+    //TODO: refactor
+    show(gridToCheck, obGridToCheck){
         let comparisons = 0;
-        // let boidToCheck = gridToCheck.getNearbyObject(this.boid);
         for(let boid of this.boid){
 
-            comparisons += boid.flockTo(gridToCheck.getNearbyObject(boid, boid.getRadius()));
-    
-                // comparisons += boid.flockTo(this.boid);
+            boid.setAcceleration(createVector(0,0));
 
+            comparisons += boid.flockTo(gridToCheck.getNearbyObject(boid.getPerceptionBoundaries()));
+            // comparisons += boid.checkObstacle(obGridToCheck.getNearbyObject(boid.getPerceptionBoundaries()));
+            
             boid.update();
             boid.show();
-            // boid.showdebug();
         }
         return comparisons;
     }
-    
-    // update(){
-    //     let boidToCheck = Array.from(this.boid);
-    //     for(let boid of this.boid){
-    //         boid.flockTo(boidToCheck);
-    //         boid.update();
-    //     }
-    // }
+
+    setAmount(amount){
+        while(flock.boid.length > amount){
+            this.removeBoid();
+        }
+        while(flock.boid.length < amount){
+            this.insertBoid(new Boid());
+        }
+    }
 
     insertBoid(boidToAdd){
         this.boid.push(boidToAdd);
-
     }
 
     removeBoid(){

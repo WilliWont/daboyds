@@ -133,7 +133,7 @@
 
                 <h5>amount</h5>
                 <div class="slider-pair">
-                    <input type="range" id="amount" min="1" max="1000" step="1" value="200" class="slider">
+                    <input type="range" id="amount" min="0" max="600" step="1" value="250" class="slider">
                     <input type="text" id="amountOutput" disabled>
                 </div>
 
@@ -148,10 +148,16 @@
                     <input type="range" id="percept" min="1" max="2" step="0.05" value="1" class="slider">
                     <input type = "text" id="perceptOutput" disabled>
                 </div>
+
+                <h5>fov</h5>
+                <div class="slider-pair">
+                    <input type="range" id="fov" min="30" max="180" step="1" value="130" class="slider">
+                    <input type = "text" id="fovOutput" disabled>
+                </div>
                 
                 <h5>reaction</h5>
                 <div class="slider-pair">
-                    <input type="range" id="react" min="1" max="2" step="0.05" value="1" class="slider">
+                    <input type="range" id="react" min="0" max="2" step="0.05" value="1" class="slider">
                     <input type = "text" id="reactOutput" disabled>
                 </div>
             
@@ -161,19 +167,19 @@
                 <h2>flock</h2>
                 <h5>alignment</h5>
                 <div class="slider-pair">
-                    <input type="range" id="align" min="0" max="4" step="0.05" value="1" class="slider">
+                    <input type="range" id="align" min="0" max="4" step="0.05" value="1.25" class="slider">
                     <input type = "text" id="alignOutput" disabled>
                 </div>
                 
                 <h5>separation</h5>
                 <div class="slider-pair">
-                    <input type="range" id="separate" min="0" max="4" step="0.05" value="1.25" class="slider">
+                    <input type="range" id="separate" min="0" max="4" step="0.05" value="1.4" class="slider">
                     <input type = "text" id="separateOutput" disabled>
                 </div>
                 
                 <h5>cohesion</h5>
                 <div class="slider-pair">
-                    <input type="range" id="cohese" min="0" max="4" step="0.05" value="1" class="slider">
+                    <input type="range" id="cohese" min="0" max="4" step="0.05" value="0.85" class="slider">
                     <input type = "text" id="coheseOutput" disabled>
                 </div>
             
@@ -204,7 +210,9 @@
         </div>
     </div>
     <script src="js/p5.js"></script>
+    <script src="js/util.js"></script>
     <script src="js/grid.js"></script>
+    <script src="js/world.js"></script>
     <script src="js/boid.js"></script>
     <script src="js/flock.js"></script>
     <script src="js/boid_sketch.js"></script>

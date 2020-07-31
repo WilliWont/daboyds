@@ -1,10 +1,8 @@
 class Grid{
 
-    constructor(radius){
+    constructor(size){
+        this.cellSize = (size);
 
-        // this.objectRadius = radius;
-        this.cellSize = radius * 2;
-        // this.cellSize *= 2;
         this.cellList = [];
 
         this.setCellColor();
@@ -13,10 +11,14 @@ class Grid{
 
     setCellColor(){
         GridCell.occupiedColor = color(255,100,100);
-        GridCell.emptyColor = (color(220,220,250));
+        GridCell.emptyColor = color(220,220,250);
+        GridCell.nonEmptyColor = color(210,210,0);
     }
 
     initGrid(){
+
+        this.cellList = [];
+
         let gridX = Math.ceil(width / this.cellSize);
         let gridY = Math.ceil(height / this.cellSize);
 
@@ -25,7 +27,7 @@ class Grid{
 
         for(let j = 0; j < gridY; j++){
             for(let i = 0; i < gridX; i++){
-                this.cellList.push(new GridCell(curX, curY, size));
+                this.cellList.push(new GridCell(curX, curY, this.cellSize));
                 curX += this.cellSize;
             }
             curY += this.cellSize;
@@ -34,17 +36,13 @@ class Grid{
         console.log('grid init \n cell: ' + this.cellSize);
     }
 
-    reInitGrid(radius){
-        this.cellSize = radius * 2;
-        // this.cellSize *= 2;
-        this.cellList = [];
+    reInitGrid(size){
+        this.setCellSize(size);
         this.initGrid();
-        console.log('grid reinit \n r: ' + radius);
     }
 
-    setCellSize(radius){
-        this.cellSize = radius * 2;
-        this.cellSize *= 2;
+    setCellSize(size){
+        this.cellSize = size;
         this.initGrid();
     }
 
@@ -53,9 +51,9 @@ class Grid{
             cell.clearCell();
     }
 
-    getNearbyObject(GameObject, radius){
+    getNearbyObject(boundaries){
         let nearbyObjects = [];
-        let cell_Id = this.getCellsForObject(GameObject, radius);
+        let cell_Id = this.getCellsForObject(boundaries);
         for(let id of cell_Id){
             let cellObjectList = this.cellList[id].objectList;
             for(let object of cellObjectList){
@@ -73,8 +71,8 @@ class Grid{
         let comparison = 0;
         for(let object of GameObjectList){
             comparison++;
-            let cell_Id = this.getCellsForObject(object, 0, false);
-
+            let cell_Id = this.getCellsForObject(object.getBoundaries());
+            comparison += cell_Id.length;
             for(let id of cell_Id){
                 comparison++;
                 this.cellList[id].registerGameObject(object);
@@ -83,22 +81,14 @@ class Grid{
         return comparison;
     }
 
-    getCellsForObject(GameObject, radius){
+    getCellsForObject(boundaries){
         let occupiedCell = [];
 
-        let position = GameObject.position;
+        let w = Math.ceil(width / this.cellSize);
 
-        let min = createVector(position.x - radius, position.y - radius);
-        let max = createVector(position.x + radius, position.y + radius);
-
-        let w = width / this.cellSize;
-
-        this.addCell(min, w, occupiedCell);
-        this.addCell(createVector(max.x, min.y), w, occupiedCell);
-        this.addCell(createVector(max.x, max.y), w, occupiedCell);
-        this.addCell(createVector(min.x, max.y), w, occupiedCell);
-
-        // console.log('object: ' + GameObject.position + ' r: ' + radius + " cells: " + occupiedCell);
+        for(let boundary of boundaries){
+            this.addCell(boundary, w, occupiedCell);
+        }
 
         return occupiedCell;
     }
@@ -107,10 +97,7 @@ class Grid{
         let id = (Math.floor(position.x / this.cellSize)) 
                + (Math.floor(position.y / this.cellSize) * w);
 
-        if(!listToAdd.includes(id)){
-            id = Math.round(id);
-
-            if(id >= 0 && id < this.cellList.length)
+        if(!listToAdd.includes(id) && id >= 0 && id < this.cellList.length){
                 listToAdd.push(id);
         }
     }
@@ -122,27 +109,50 @@ class Grid{
         return comparison;
     }
 
-    showdebug(GameObject, radius){
+    //#region show methods
+    showdebug(boundaries){
 
+        this.showEmptyCells();
+
+        this.showNonEmptyCells();
+
+        this.showOccupiedCells(boundaries);
+
+    }
+
+    showEmptyCells(){
         let id = 0;
         for(let cell of this.cellList){
-            cell.showEmpty(id,this.cellSize);
+            cell.showEmpty(id);
             id++;
         }
-
-        // TODO: the code for showing occupied cells
-        // is working inconsistently, perhaps a bugfix later
-
-        // let cell_Id = this.getCellsForObject(GameObject, radius);
-        // for(let oc of cell_Id){
-        //     let cell = this.cellList[oc];
-        //     cell.showOccupied(oc,this.cellSize);
-        // }
     }
+
+    showNonEmptyCells(){
+        let id = 0;
+        for(let cell of this.cellList){
+            if(cell.objectList.length > 0){
+                cell.showNonEmpty(id);
+            }
+            id++;
+        }
+    }
+
+    showOccupiedCells(boundaries){
+        if(boundaries != null){
+            let cell_Id = this.getCellsForObject(boundaries);
+            for(let oc of cell_Id){
+                let cell = this.cellList[oc];
+                cell.showOccupied(oc);
+            }
+        }
+    }
+    //#endregion
 }
 
 class GridCell{
     static occupiedColor;
+    static nonEmptyColor;
     static emptyColor;
 
     constructor(x,y,size){
@@ -153,32 +163,44 @@ class GridCell{
     }
 
     registerGameObject(GameObject){
-        if(!this.objectList.includes(GameObject))
-            this.objectList.push(GameObject);
+        // if(!this.objectList.includes(GameObject))
+        this.objectList.push(GameObject);
     }
 
     clearCell(){
         this.objectList.splice(0,this.objectList.length);
     }
 
-    showOccupied(id,size){
+    //#region show methods
+    showOccupied(id){
         push();
         stroke(GridCell.occupiedColor);
         fill(GridCell.occupiedColor);
         text(id, this.x, this.y+10);
         noFill();
         strokeWeight(2);
-        square(this.x,this.y,size);
+        square(this.x,this.y, this.size);
         pop();
     }
 
-    showEmpty(id,size){
+    showEmpty(id){
         push();
         fill(GridCell.emptyColor);
         text(id, this.x, this.y+10);
         stroke(GridCell.emptyColor);
         noFill();
-        square(this.x,this.y,size);
+        square(this.x,this.y,this.size);
         pop();
     }
+
+    showNonEmpty(id){
+        push();
+        fill(GridCell.nonEmptyColor);
+        text(id, this.x, this.y+10);
+        stroke(GridCell.nonEmptyColor);
+        noFill();
+        square(this.x,this.y,this.size);
+        pop();
+    }
+    //#endregion
 }
