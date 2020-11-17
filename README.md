@@ -17,3 +17,5 @@ With these three rules, each boid can demonstrate a rather accurate interpretati
 * [Daniel Shifftman's Coding Challenge on Flocking Simulation](https://www.youtube.com/watch?v=mhjuuHl6qHM&feature=youtu.be)
 * [Conkerjo's Spatial Hashing](https://conkerjo.wordpress.com/2009/06/13/spatial-hashing-implementation-for-fast-2d-collisions/)
 * [Flaticon's Icons](https://www.flaticon.com/authors/freepik)
+
+[Demonstration](https://williwont.github.io/daboyds/)
